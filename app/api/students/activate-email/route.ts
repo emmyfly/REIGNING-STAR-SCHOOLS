@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
     .from("admins")
     .select("role")
     .eq("auth_id", user.id)
-    .single();
+    .single<{ role: string }>();
 
   if (!admin || !["super_admin", "admin"].includes(admin.role)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
