@@ -26,7 +26,7 @@ export async function sendNotifications(payload: NotificationPayload) {
 
   const { error: insertErr } = await supabase
     .from("student_notifications")
-    .insert(rows);
+    .insert(rows as never[]);
 
   if (insertErr) {
     console.error("[notifications] insert error:", insertErr.message);

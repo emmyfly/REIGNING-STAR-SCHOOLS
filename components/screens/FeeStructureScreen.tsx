@@ -105,11 +105,11 @@ export function FeeStructureScreen() {
       .map((r) => ({
         ...(r.id ? { id: r.id } : {}),
         session_id: selectedSessionId,
-        class_id: selectedClassId || null,
+        class_id: selectedClassId || undefined,
         category: r.category,
         description: r.description,
         amount: parseFloat(r.amount),
-        due_date: r.due_date || null,
+        due_date: r.due_date || undefined,
       }));
     await saveMutation.mutateAsync({ rows: upsertRows, deletedIds });
     setDirty(false);

@@ -157,7 +157,7 @@ function CSVImportDialog({
       class_id: classMap.get(r.class_name.toLowerCase()) ?? "",
       guardian_name: r.guardian_name,
       guardian_phone: r.guardian_phone,
-      guardian_email: r.guardian_email || null,
+      guardian_email: r.guardian_email || undefined,
       address: r.address,
       status: "active" as const,
       admission_date: new Date().toISOString().slice(0, 10),

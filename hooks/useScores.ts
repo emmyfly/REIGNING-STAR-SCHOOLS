@@ -57,7 +57,7 @@ export function useScoresByTermAndClass(termId?: string, classId?: string) {
               .from("students")
               .select("id")
               .eq("class_id", classId!)
-          ).data?.map((s) => s.id) ?? []
+          ).data?.map((s: { id: string }) => s.id) ?? []
         );
       return (data ?? []) as unknown as Score[];
     },
@@ -101,7 +101,7 @@ export function useBulkUpsertScores() {
       if (error) throw error;
 
       // Trigger server-side ranking computation
-      await supabase.rpc("compute_rankings", { p_term_id: termId });
+      await supabase.rpc("compute_rankings", { p_term_id: termId } as never);
 
       return validRows.length;
     },

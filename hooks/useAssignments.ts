@@ -75,8 +75,9 @@ export function useCreateAssignment() {
         .single();
       if (error) throw error;
 
+      const assignData = data as { id: string } | null;
       // If publishing, send notifications
-      if (values.status === "published" && data?.id) {
+      if (values.status === "published" && assignData?.id) {
         const studentIds =
           values.class_id === "all"
             ? await getAllStudentIds()
@@ -86,11 +87,11 @@ export function useCreateAssignment() {
           title: `New Assignment: ${values.title}`,
           body: values.description?.slice(0, 120) ?? "",
           type: "assignment",
-          reference_id: data.id,
+          reference_id: assignData.id,
         });
       }
 
-      return data;
+      return assignData;
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["assignments"] });

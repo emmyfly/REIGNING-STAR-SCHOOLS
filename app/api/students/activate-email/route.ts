@@ -30,10 +30,16 @@ export async function POST(request: NextRequest) {
   const adminClient = createAdminClient();
 
   // Fetch students to activate
-  const { data: students, error: fetchError } = await adminClient
+  const { data: rawStudents, error: fetchError } = await adminClient
     .from("students")
     .select("id, admission_number, full_name, has_email_account")
     .in("id", student_ids);
+  const students = rawStudents as Array<{
+    id: string;
+    admission_number: string;
+    full_name: string;
+    has_email_account: boolean;
+  }> | null;
 
   if (fetchError || !students) {
     return NextResponse.json({ error: "Failed to fetch students" }, { status: 500 });
@@ -80,7 +86,7 @@ export async function POST(request: NextRequest) {
         auth_id: authData.user.id,
         email,
         has_email_account: true,
-      })
+      } as never)
       .eq("id", student.id);
 
     if (updateError) {

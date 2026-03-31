@@ -87,9 +87,9 @@ export interface Database {
           student_id: string;
           subject_id: string;
           term_id: string;
-          ca_score: number;   // 0–40
-          exam: number;       // 0–60
-          total: number;      // 0–100
+          ca_score: number;
+          exam: number;
+          total: number;
           grade: string;
           remark: string;
           position: number | null;
@@ -103,10 +103,15 @@ export interface Database {
           id: string;
           title: string;
           description: string;
+          type: "holiday" | "project" | "take_home" | "class_work";
           subject_id: string;
           class_id: string;
+          session_id: string;
+          term_id: string;
           due_date: string;
           max_score: number;
+          instructions: string | null;
+          file_urls: string[] | null;
           status: "draft" | "published" | "closed";
           created_by: string;
           created_at: string;
@@ -140,6 +145,7 @@ export interface Database {
           options: Json | null;
           correct_answer: string;
           marks: number;
+          tags: string[] | null;
           term_id: string | null;
           created_by: string;
           created_at: string;
@@ -147,22 +153,21 @@ export interface Database {
         Insert: Omit<Database["public"]["Tables"]["questions"]["Row"], "id" | "created_at">;
         Update: Partial<Database["public"]["Tables"]["questions"]["Insert"]>;
       };
-      exams: {
+      exam_papers: {
         Row: {
           id: string;
           title: string;
           subject_id: string;
           class_id: string;
-          term_id: string;
-          duration_minutes: number;
+          session_id: string | null;
+          term_id: string | null;
+          question_ids: string[];
           total_marks: number;
-          start_time: string;
-          end_time: string;
-          status: "draft" | "published" | "active" | "completed";
+          created_by: string | null;
           created_at: string;
         };
-        Insert: Omit<Database["public"]["Tables"]["exams"]["Row"], "id" | "created_at">;
-        Update: Partial<Database["public"]["Tables"]["exams"]["Insert"]>;
+        Insert: Omit<Database["public"]["Tables"]["exam_papers"]["Row"], "id" | "created_at">;
+        Update: Partial<Database["public"]["Tables"]["exam_papers"]["Insert"]>;
       };
       fee_structures: {
         Row: {
@@ -173,7 +178,7 @@ export interface Database {
           category: "tuition" | "uniform" | "textbook" | "transport" | "exam" | "other";
           amount: number;
           description: string;
-          due_date: string;
+          due_date: string | null;
           created_at: string;
         };
         Insert: Omit<Database["public"]["Tables"]["fee_structures"]["Row"], "id" | "created_at">;
@@ -184,10 +189,13 @@ export interface Database {
           id: string;
           student_id: string;
           fee_id: string;
+          session_id: string | null;
+          term_id: string | null;
           amount_paid: number;
           payment_method: "bank_transfer" | "cash" | "pos" | "online";
           reference: string;
           receipt_url: string | null;
+          rejection_note: string | null;
           status: "pending" | "paid" | "partial" | "overdue";
           paid_at: string;
           verified_by: string | null;
@@ -201,7 +209,8 @@ export interface Database {
           id: string;
           student_id: string | null;
           submitted_by: string;
-          category: "academic" | "welfare" | "financial" | "facility" | "other";
+          is_anonymous: boolean;
+          category: "bullying" | "academic" | "fees" | "assignment" | "teacher" | "facilities" | "general" | "suggestion";
           subject: string;
           description: string;
           status: "open" | "in_progress" | "resolved" | "closed";
@@ -228,6 +237,20 @@ export interface Database {
         };
         Insert: Omit<Database["public"]["Tables"]["announcements"]["Row"], "id" | "created_at">;
         Update: Partial<Database["public"]["Tables"]["announcements"]["Insert"]>;
+      };
+      student_notifications: {
+        Row: {
+          id: string;
+          student_id: string;
+          title: string;
+          body: string;
+          type: "assignment" | "payment" | "complaint" | "announcement" | "general";
+          reference_id: string | null;
+          is_read: boolean;
+          created_at: string;
+        };
+        Insert: Omit<Database["public"]["Tables"]["student_notifications"]["Row"], "id" | "created_at">;
+        Update: Partial<Database["public"]["Tables"]["student_notifications"]["Insert"]>;
       };
       school_settings: {
         Row: {

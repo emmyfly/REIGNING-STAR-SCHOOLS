@@ -22,12 +22,19 @@ export function useSchoolLeaderboard(termId?: string) {
     enabled: !!termId,
     queryFn: async () => {
       const supabase = createClient();
-      const { data: scores } = await supabase
+      const { data: rawScores } = await supabase
         .from("scores")
         .select("student_id, total, position, student:students(id,full_name,class:classes(id,name))")
         .eq("term_id", termId!);
 
-      if (!scores?.length) return [];
+      if (!rawScores?.length) return [];
+
+      const scores = rawScores as unknown as Array<{
+        student_id: string;
+        total: number;
+        position: number | null;
+        student: { id: string; full_name: string; class?: { id: string; name: string } } | null;
+      }>;
 
       const map = new Map<
         string,
@@ -35,11 +42,7 @@ export function useSchoolLeaderboard(termId?: string) {
       >();
 
       for (const s of scores) {
-        const student = s.student as unknown as {
-          id: string;
-          full_name: string;
-          class?: { id: string; name: string };
-        };
+        const student = s.student;
         if (!student) continue;
         if (!map.has(s.student_id)) {
           map.set(s.student_id, {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import {
   Plus, Eye, Pencil, Trash2, RefreshCw, BookOpen,
   FileUp, Users, AlertCircle,
@@ -27,7 +27,6 @@ import { useAcademicSessions, useAcademicTerms } from "@/hooks/useAcademicTerms"
 import { useSettingsStore } from "@/stores/settingsStore";
 import { formatDate } from "@/lib/utils/formatting";
 import { Assignment, AssignmentStatus, AssignmentType } from "@/types";
-import { cn } from "@/lib/utils";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const ASSIGNMENT_TYPES: { value: AssignmentType; label: string }[] = [
@@ -367,7 +366,7 @@ export function AssignmentsScreen({
 }: {
   onViewSubmissions?: (assignmentId: string) => void;
 }) {
-  const { currentTerm } = useSettingsStore();
+  const { currentTerm, currentSession } = useSettingsStore();
   const [activeTab, setActiveTab] = useState<AssignmentStatus | "all">("all");
   const [filterSubject, setFilterSubject] = useState("");
   const [filterClass, setFilterClass] = useState("");

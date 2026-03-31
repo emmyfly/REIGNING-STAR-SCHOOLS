@@ -36,7 +36,7 @@ export function useDashboardStats(termId?: string) {
         supabase.from("complaints").select("*", { count: "exact", head: true }).eq("status", "open"),
       ]);
 
-      const totalRevenue = (verifiedData ?? []).reduce(
+      const totalRevenue = ((verifiedData ?? []) as { amount_paid: number }[]).reduce(
         (sum, p) => sum + (p.amount_paid ?? 0),
         0
       );
@@ -62,17 +62,23 @@ export function useTopPerformers(termId?: string, limit = 5) {
     enabled: !!termId,
     queryFn: async () => {
       const supabase = createClient();
-      const { data: scores } = await supabase
+      const { data: rawScores } = await supabase
         .from("scores")
         .select("student_id, total, student:students(id, full_name, admission_number, class:classes(name))")
         .eq("term_id", termId!);
 
-      if (!scores?.length) return [];
+      if (!rawScores?.length) return [];
+
+      const scores = rawScores as unknown as Array<{
+        student_id: string;
+        total: number;
+        student: { id: string; full_name: string; class?: { name: string } } | null;
+      }>;
 
       // Group totals by student
       const map = new Map<string, { name: string; class_name: string; totals: number[] }>();
       for (const s of scores) {
-        const student = s.student as unknown as { id: string; full_name: string; class?: { name: string } };
+        const student = s.student;
         if (!student) continue;
         if (!map.has(s.student_id)) {
           map.set(s.student_id, {

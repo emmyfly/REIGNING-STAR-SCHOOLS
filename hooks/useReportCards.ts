@@ -32,7 +32,7 @@ export function useStudentsWithScores(classId?: string, termId?: string) {
             .in(
               "student_id",
               (await supabase.from("students").select("id").eq("class_id", classId!))
-                .data?.map((s) => s.id) ?? []
+                .data?.map((s: { id: string }) => s.id) ?? []
             ),
           supabase.from("classes").select("name").eq("id", classId!).single(),
         ]);

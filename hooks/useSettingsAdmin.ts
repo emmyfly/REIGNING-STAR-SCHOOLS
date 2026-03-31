@@ -2,7 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { createClient } from "@/lib/supabase/client";
-import { Subject, SchoolClass, GradeScale, AcademicSession } from "@/types";
+import { Subject, SchoolClass, GradeScale } from "@/types";
 import { toast } from "sonner";
 
 // ─── Subjects ─────────────────────────────────────────────────────────────────
@@ -95,10 +95,12 @@ export function useSaveGradingScale() {
   return useMutation({
     mutationFn: async (scale: GradeScale[]) => {
       const supabase = createClient();
+      const { data: settingsRow } = await supabase.from("school_settings").select("id").single();
+      const settingsId = (settingsRow as { id: string } | null)?.id ?? "";
       const { error } = await supabase
         .from("school_settings")
         .update({ grading_system: scale } as never)
-        .eq("id", (await supabase.from("school_settings").select("id").single()).data?.id);
+        .eq("id", settingsId);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -128,7 +130,8 @@ export function useCreateAcademicSession() {
         .single();
       if (error) throw error;
 
-      const termRows = terms.map((t) => ({ ...t, session_id: data.id, is_current: false }));
+      const sessionId = (data as { id: string } | null)?.id ?? "";
+      const termRows = terms.map((t) => ({ ...t, session_id: sessionId, is_current: false }));
       const { error: termErr } = await supabase.from("academic_terms").insert(termRows as never[]);
       if (termErr) throw termErr;
     },
@@ -209,10 +212,11 @@ export function useUpdateSchoolSettings() {
         .from("school_settings")
         .select("id")
         .single();
+      const existingId = (existing as { id: string } | null)?.id ?? "";
       const { error } = await supabase
         .from("school_settings")
         .update(values as never)
-        .eq("id", existing?.id);
+        .eq("id", existingId);
       if (error) throw error;
     },
     onSuccess: () => {

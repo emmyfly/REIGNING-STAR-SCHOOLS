@@ -46,7 +46,7 @@ export function useCreateAnnouncement() {
         title: values.title ?? "New Announcement",
         body: values.body?.slice(0, 120) ?? "",
         type: "announcement",
-        reference_id: data?.id,
+        reference_id: (data as { id: string } | null)?.id,
       });
     },
     onSuccess: () => {

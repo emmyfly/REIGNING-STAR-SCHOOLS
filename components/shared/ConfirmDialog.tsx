@@ -8,7 +8,10 @@ import { Button } from "@/components/ui/button";
 
 interface ConfirmDialogProps {
   open: boolean;
-  onOpenChange: (open: boolean) => void;
+  /** Called when the dialog requests close. Use either this or onCancel. */
+  onOpenChange?: (open: boolean) => void;
+  /** Alternative to onOpenChange for simple cancel callbacks. */
+  onCancel?: () => void;
   title: string;
   description: string;
   confirmLabel?: string;
@@ -21,6 +24,7 @@ interface ConfirmDialogProps {
 export function ConfirmDialog({
   open,
   onOpenChange,
+  onCancel,
   title,
   description,
   confirmLabel = "Confirm",
@@ -29,15 +33,20 @@ export function ConfirmDialog({
   onConfirm,
   isLoading,
 }: ConfirmDialogProps) {
+  const handleClose = () => {
+    onCancel?.();
+    onOpenChange?.(false);
+  };
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={(o) => !o && handleClose()}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isLoading}>
+          <Button variant="outline" onClick={handleClose} disabled={isLoading}>
             {cancelLabel}
           </Button>
           <Button variant={variant} onClick={onConfirm} disabled={isLoading}>

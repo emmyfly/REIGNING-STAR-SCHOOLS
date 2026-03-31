@@ -356,7 +356,6 @@ export function ReportCardsScreen() {
             {previewStudent ? (
               <div className="h-[560px] w-full rounded-b-xl overflow-hidden">
                 <PDFViewer width="100%" height="100%" showToolbar={false}>
-                  {/* @ts-expect-error dynamic import type mismatch */}
                   <ReportCardDocument data={previewStudent} />
                 </PDFViewer>
               </div>

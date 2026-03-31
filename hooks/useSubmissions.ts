@@ -64,9 +64,9 @@ export function useGradeSubmission() {
         reference_id: id,
       });
     },
-    onSuccess: (_, { assignmentId }: { assignmentId?: string } & Record<string, unknown>) => {
+    onSuccess: () => {
+      // Invalidates all ["submissions", assignmentId] keys via prefix match
       qc.invalidateQueries({ queryKey: ["submissions"] });
-      if (assignmentId) qc.invalidateQueries({ queryKey: ["submissions", assignmentId] });
       toast.success("Grade saved");
     },
     onError: (err: Error) => toast.error(err.message),
